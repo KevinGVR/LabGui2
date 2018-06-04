@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <bits/stl_vector.h>
+#include <limits.h>
 
 
 std::list<int>::iterator it;
@@ -89,16 +90,19 @@ bool Laberinto::xstVrt(int idVrt) const {
 }
 
 bool Laberinto::xstAdy(int idVrtO, int idVrtD) const {
-bool booleano;
+bool booleano = false;;
     if (idVrtO < vertices.size()){
         if (0 <= idVrtO){
            if (idVrtD < vertices.size()-1){
-                if (0 <= idVrtD){
-//                    vertices::iterator it;
-//                    for(it.begin();it != it.end()){
-//                        vertices[idVrtO].lstAdy.;
-//                        //booleano = arregloVrts[idVrtO].lstAdy.buscar(idVrtD);   
-//                    }
+                if (0 <= idVrtD){                    
+                    vector<int>ady;
+                    obtIdVrtAdys(idVrtO,ady);
+                    int i=0;
+                    while(ady[i] != idVrtD || i<ady.size()){
+                        if(ady[i] == idVrtD){
+                            booleano = true;
+                        }
+                    }
                 }
             }
         }
@@ -137,11 +141,45 @@ int Laberinto::obtTotVrt() const {
     return sizeof(vertices);
 }
 
-//int Laberinto::caminoMasCorto(int idVrtO, int idVrtD, vector<int>& camino) const {
-//}
-//
-//int Laberinto::caminoEncontrado(int idVrtO, int idVrtD, vector<int>& camino) const {
-//}
+int Laberinto::caminoMasCorto(int idVrtO, int idVrtD, vector<int>& camino) const {
+    vector<int>dist;
+    vector<int>previo;
+    vector<bool>visitados;
+    dist.resize(sizeof(vertices,INT_MAX));
+    previo.resize(sizeof(vertices,-1));
+    visitados.resize(sizeof(vertices,false));
+    if ((idVrtO < sizeof(vertices))&&(0 <= idVrtO)&&(idVrtD < sizeof(vertices))&&(0 <= idVrtD)){
+        for (int p=0; p<sizeof(vertices); p++){
+            if(xstAdy(idVrtO,p)){
+                dist[p]= 1;
+                previo[p]=idVrtO;
+            }
+        }
+        dist[idVrtO] = 0;  
+        while(visitados[idVrtD]== false){              //busca la distancia menor y el vertice que la tiene
+            int idVrtMenor=-1;
+            int distMenor= INT_MAX;
+            for(int y = 0; y<sizeof(vertices); y++){
+                if(dist[y]<distMenor && !visitados[y]){
+                    idVrtMenor=y;
+                    distMenor=dist[y];
+                    previo[y]=idVrtO;
+                }
+            }
+            vector<int>ady;
+            obtIdVrtAdys(idVrtMenor,ady);
+            visitados[idVrtMenor]=true;
+            int prev=idVrtMenor;
+            for(int i=0;i<sizeof(idVrtMenor);i++){               
+                if(!visitados[ady[i]] && dist[idVrtMenor]+1<dist[ady[i]]){
+                    dist[ady[i]]=dist[idVrtMenor]+1;
+                }
+            }
+        }
+    }
+}
+int Laberinto::caminoEncontrado(int idVrtO, int idVrtD, vector<int>& camino) const {
+}
 
 double Laberinto::sumaTotalFerormona() const {
     double fero;
@@ -171,13 +209,19 @@ void Laberinto::asgDatoAdy(int idVrtO, int idVrtD, const Adyacencia& ady) {
 void Laberinto::decrementarFerormonaAdys(double decrFerormona) {
     std::map<int,Adyacencia>::const_iterator it = datosAdys.begin();
     while ( it!=datosAdys.end()){
-        Adyacencia adya(it->second);
-        
-        it++;
+    it->second.asgCntFerormona(it->second.obtCntFerormona()*decrFerormona-it->second.obtCntFerormona());
+    it++;
     }
 }
 
 void Laberinto::actualizarValoracionAdys() {
+    for (int i=0;i<sizeof(vertices);i++){
+        std::map<int,Adyacencia>::const_iterator it = vertices[i].lstAdy.begin();
+        while ( it!=vertices[i].lstAdy.end()){
+            
+            it++;    
+        }
+    }
 }
 
 int Laberinto::obtIndiceAdy(int f, int c) const {
@@ -188,3 +232,5 @@ int Laberinto::obtIndiceAdy(int f, int c) const {
     }
     return f * vertices.size() + c - f * (f + 1) / 2;
 }
+    
+    
