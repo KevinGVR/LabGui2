@@ -15,79 +15,80 @@
 #include "Adyacencia.h"
 
 Laberinto::Laberinto(int cantidadVrts, double probabilidadAdy): laberintoPtr(shared_ptr< Grafo < int,Adyacencia > >(new Grafo< int,Adyacencia >(cantidadVrts,probabilidadAdy))), laberinto(*laberintoPtr){
-    idVrtInicial = -1;  //Inicializa la variable idVrtInicial
-    idVrtFinal = -1;    //Inicializa la variable idVrtFinal
-//    for(int i = 0; i<laberinto.obtTotVrt(); i++){
-//        vector<int> rsp;
-//        laberinto.obtIdVrtAdys(i, rsp);
-//        for(int j= 0; j< rsp.size(); j++){
-//            Adyacencia a(1,0);
-//            laberinto.asgDatoAdy(i,rsp[j],a);
-//        }
-//    }
+    idVrtInicial = -1;
+    idVrtFinal = -1;
     
 }
 
 Laberinto::Laberinto(ifstream& archivo): laberintoPtr(shared_ptr< Grafo < int,Adyacencia > >(new Grafo< int,Adyacencia >(archivo))), laberinto(*laberintoPtr) {
-    idVrtInicial= -1;   //Inicializa la variable idVrtInicial
-    idVrtFinal = -1;    //Inicializa la variable idVrtFinal
-//    for(int i = 0; i<laberinto.obtTotVrt(); i++){
-//        vector<int> rsp;
-//        laberinto.obtIdVrtAdys(i, rsp);
-//        for(int j= 0; j< rsp.size(); j++){
-//            Adyacencia a(1,0);
-//            laberinto.asgDatoAdy(i,rsp[j],a);
-//        }
-//    }
+    idVrtInicial= -1;
+    idVrtFinal = -1;
 }
 
 Laberinto::Laberinto(const Laberinto& orig): laberintoPtr(shared_ptr< Grafo < int,Adyacencia > >(new Grafo< int,Adyacencia >(orig.laberinto))), laberinto(*laberintoPtr) {
-    idVrtInicial = orig.obtIdVrtInicial();  //Inicializa la variable idVrtInicial con la variable idVrtInicial de orig
-    idVrtFinal = orig.obtIdVrtFinal();      //Inicializa la variable idVrtInicial con la variable idVrtInicial de orig
+    idVrtInicial = orig.obtIdVrtInicial();
+    idVrtFinal = orig.obtIdVrtFinal();
 }
-//Destructor
+
 Laberinto::~Laberinto() {
 }
 
 /* MÉTODOS OBSERVADORES BÁSICOS */
 bool Laberinto::xstVrt(int idVrt) const {
-    return laberinto.xstVrt(idVrt); //Retorna si exite el vertice en el laberinto
+    return laberinto.xstVrt(idVrt);
 }
 
 bool Laberinto::xstAdy(int idVrtO, int idVrtD) const {
-    return laberinto.xstAdy(idVrtO,idVrtD); //Retorna si existe la adyacencia entre el vertice idVrtO y el rl vertiCE idVrtD
+    return laberinto.xstAdy(idVrtO,idVrtD);
 }
 
 int Laberinto::obtIdVrtInicial() const {
-    return idVrtInicial;    //Retorna el vertice Inicial del laberinto
+    return idVrtInicial;
 }
 
 int Laberinto::obtIdVrtFinal() const {
-    return idVrtFinal;  //Retorna el vertice Final del laberinto
+    return idVrtFinal;
 }
 
 void Laberinto::obtIdVrtAdys(int idVrt, vector< int >& rsp) const {
-    laberinto.obtIdVrtAdys(idVrt,rsp); //Obtiene en el vector rsp todas las adyacencias del vetice merdiante la plantilla grafo
+    laberinto.obtIdVrtAdys(idVrt,rsp);
 }
 
 Adyacencia Laberinto::obtDatoAdy(int idVrtO, int idVrtD) const {
-    laberinto.obtDatoAdy(idVrtO,idVrtD); //Obtiene la adyecencia entre el vertice idVrtO y el vertice idVrtD  merdiante la plantilla grafo
+    laberinto.obtDatoAdy(idVrtO,idVrtD);
 }
 
 int Laberinto::obtTotAdy() const {
-    laberinto.obtTotAdy(); // Obtiene el total de adyacencias del laberinto del laberinto mediante la plsntilla grafo
+    laberinto.obtTotAdy();
 }
 
 int Laberinto::obtTotVrt() const {
-    laberinto.obtTotVrt();  // Obtiene el total de vertices del laberinto del laberinto mediante la plsntilla grafo
+    laberinto.obtTotVrt();
 }
 
 int Laberinto::caminoMasCorto(int idVrtO, int idVrtD, vector< int >& camino) const {
-    laberinto.caminoMasCorto(idVrtO,idVrtD,camino); //Obtiene el camino mas corto del laberinto mediante la pantilla grafo
+    laberinto.caminoMasCorto(idVrtO,idVrtD,camino);
 }
 
 int Laberinto::caminoEncontrado(int idVrtO, int idVrtD, vector<int>& camino) const {
-    return 0;
+    int vrtActual=idVrtO;    
+    while(vrtActual != idVrtD){
+        camino.push_back(vrtActual);
+        double masFero=-1;
+        int idMasFero =-1;
+        vector<int> adys;
+        laberinto.obtIdVrtAdys(vrtActual,adys);
+        for(int i=0; i<adys.size();i++){
+            Adyacencia adya;
+            adya = laberinto.obtDatoAdy(vrtActual,adys[0]);
+            if(adya.obtCntFerormona()>masFero){                
+                masFero=adya.obtCntFerormona();
+                idMasFero=adys[i];
+            }
+        }
+        vrtActual=idMasFero;
+    }
+    return camino.size();
 }
 
 double Laberinto::sumaTotalFerormona() const {
@@ -96,20 +97,21 @@ double Laberinto::sumaTotalFerormona() const {
     for(int i=0;i<laberinto.obtTotVrt();i++){ 
         laberinto.obtIdVrtAdys(i,vect);
         for(int j=0;j<vect.size();j++){
-            if(laberinto.xstAdy(0,vect[j])){
-                suma += laberinto.obtDatoAdy(i,vect[j]).obtCntFerormona();
-            }
+            if(laberinto.xstAdy(i,vect[j])){
+                laberinto.obtDatoAdy(i,vect[j]);
+                suma = suma + laberinto.obtDatoAdy(i,vect[j]).obtCntFerormona();
+            }   
         }
     }  
     return suma;
 }
 
 void Laberinto::asgVrtInicial(int idVrtInicialN) {
-    idVrtInicial = idVrtInicialN; //asigna al vertice inicial un valor
+    idVrtInicial = idVrtInicialN;
 }
 
 void Laberinto::asgVrtFinal(int idVrtFinalN) {
-    idVrtFinal = idVrtFinalN; // asigna al vertice final un valor
+    idVrtFinal = idVrtFinalN;
 }
 
 void Laberinto::asgDatoAdy(int idVrtO, int idVrtD, const Adyacencia& ady) {

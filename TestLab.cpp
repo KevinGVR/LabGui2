@@ -26,22 +26,29 @@
 void testLaberinto() {
     bool booleano = false;
     int cantidadVrts = 10;
-    double probabilidadAdy = 0.5;
-    int cantAdyTot = 0;
+    double probabilidadAdy = 0.2;
     int cantLab;
     srand (time(NULL));
     cantLab = rand() % 100 +10000;
+    vector<int> vect;
+    vect.resize(cantLab);    
     for(int i = 0; i <cantLab; i++){
         Laberinto laberinto(cantidadVrts, probabilidadAdy);
-            if (laberinto.obtTotVrt()!=10){
-                    std::cout << "%TEST_FAILED% time=0 testname=testLaberinto (PbsLaberinto) message=error Falló metodo contructor (cantidad vertices)" << std::endl;
-            }
-        }          
+        vect[i]=laberinto.obtTotAdy();
+        if (laberinto.obtTotVrt()!=10){
+            std::cout << "%TEST_FAILED% time=0 testname=testLaberinto (PbsLaberinto) message=error Falló metodo contructor (cantidad vertices)" << std::endl;
+        }
+    }          
     
-    double res = (cantAdyTot/100 - probabilidadAdy*cantidadVrts*(cantidadVrts-1));
-    if ((cantAdyTot/100 - probabilidadAdy*cantidadVrts*(cantidadVrts-1))<= 45){
-         if (res >= -45 || res <= 45){
-             booleano = true;
+    int cant=0;
+    for(int i=0;i<vect.size();i++){
+        cant+= vect[i];
+    }
+    double average =cant/cantLab;
+    for(int i=0;i<cantLab;i++)
+        if (vect[i]-average<= 45){
+            if (vect[i]-average >= -45){
+                booleano = true;
          }
     }
     if (booleano == false)
@@ -51,9 +58,7 @@ void testLaberinto() {
 void testLaberinto2() {   
     bool booleano = true;
     int contador;
-    int vertice;
-    //ifstream& archivoEnterosEntrada;
-    
+    int vertice;    
     int pe;
     ifstream archivoEnterosEntrada("laberintop.txt", ios::in);
     Laberinto laberinto(archivoEnterosEntrada);
@@ -81,9 +86,10 @@ void testLaberinto2() {
         finLinea = archivoEnterosEntrada.peek();
         }
         contador++;
-        vector<int> ady;
-        laberinto.obtIdVrtAdys(vertice,ady);
-        if (contador != ady.size()){
+        vector<int> aux;
+        laberinto.obtIdVrtAdys(vertice,aux);
+        int cant = aux.size();
+        if (contador != cant){
             booleano = false;
         }
         
@@ -95,6 +101,50 @@ void testLaberinto2() {
 
 
 void testLaberinto3() {
+    bool booleano = true;
+    int contador;
+    int vertice;
+    
+   int pe;
+    ifstream archivoEnterosEntrada("laberintom.txt", ios::in);
+    Laberinto laberinto(archivoEnterosEntrada);
+    char finLinea = ' ';
+
+    archivoEnterosEntrada >> pe;
+    
+    // salta a la siguiente para leer el primer número de la línea #2
+    archivoEnterosEntrada >> pe;
+    while (!archivoEnterosEntrada.eof() && booleano) {
+        vertice = 0;
+        contador = 0;
+        while (!archivoEnterosEntrada.eof()&&(finLinea != 10)) { // 10 ascii de fin de línea
+            archivoEnterosEntrada >> pe;
+            archivoEnterosEntrada.get(); 
+            finLinea = archivoEnterosEntrada.peek();
+            
+            contador++;
+        }
+        
+        if (!archivoEnterosEntrada.eof()){
+        archivoEnterosEntrada >> pe;
+        archivoEnterosEntrada.get();
+        finLinea = archivoEnterosEntrada.peek();
+        }
+        
+        vector<int> aux;
+        laberinto.obtIdVrtAdys(vertice,aux);
+        int cant = aux.size();
+        if (contador != cant){
+            booleano = false;
+        }
+        vertice ++;
+        
+ }
+    if (!booleano)
+        std::cout << "%TEST_FAILED% time=0 testname=testLaberinto3 (PbsLaberinto) message=error Fallo netodo constructor con lector archivos" << std::endl;   
+}
+
+void testLaberinto4() {
     bool booleano = true;
     int contador;
     int vertice;
@@ -137,14 +187,7 @@ void testLaberinto3() {
         std::cout << "%TEST_FAILED% time=0 testname=testLaberinto3 (PbsLaberinto) message=error Fallo netodo constructor con lector archivos" << std::endl;   
 }
 
-void testLaberinto4() {   
-    bool booleano;
-    
-    if (!booleano)
-        std::cout << "%TEST_FAILED% time=0 testname=testLaberinto2 (PbsLaberinto) message=error Fallo netodo constructor con lector archivos" << std::endl;
-    
-    
-}
+
 
 
 void testCaminoMasCorto() {
@@ -222,10 +265,10 @@ void testCaminoEncontrado() {
 }
 
 void testSumaTotalFerormona() {
-    ifstream archivoEnterosEntrada("laberintop.txt", ios::in);
+    ifstream archivoEnterosEntrada("laberintop.txt",ios::in);
     Laberinto laberinto(archivoEnterosEntrada);
     double result = laberinto.sumaTotalFerormona();
-    if (result != 10) {
+    if (result != 10.0) {
         std::cout << "%TEST_FAILED% time=0 testname=testSumaTotalFerormona (PbsLaberinto) message=error message sample" << std::endl;
     }
 }
@@ -241,10 +284,14 @@ int main(int argc, char** argv) {
     std::cout << "%TEST_STARTED% testLaberinto2 (PbsLaberinto)" << std::endl;
     testLaberinto2();
     std::cout << "%TEST_FINISHED% time=0 testLaberinto2 (PbsLaberinto)" << std::endl;
- 
+    
     std::cout << "%TEST_STARTED% testLaberinto3 (PbsLaberinto)" << std::endl;
     testLaberinto3();
     std::cout << "%TEST_FINISHED% time=0 testLaberinto3 (PbsLaberinto)" << std::endl;
+    
+    std::cout << "%TEST_STARTED% testLaberinto4 (PbsLaberinto)" << std::endl;
+    testLaberinto4();
+    std::cout << "%TEST_FINISHED% time=0 testLaberinto4 (PbsLaberinto)" << std::endl;
 
     std::cout << "%TEST_STARTED% testCaminoMasCorto (PbsLaberinto)" << std::endl;
     testCaminoMasCorto();
